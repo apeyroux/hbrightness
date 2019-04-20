@@ -43,7 +43,7 @@ pOpt = Opt
     (OA.long "action"
      <> OA.short 'a'
      <> OA.value Up
-     <> OA.metavar "ACTION")-- (pure Up OA.<|> pure Down)
+     <> OA.metavar "Up|Down")-- (pure Up OA.<|> pure Down)
 
 pMonitor :: T.Text -> Parser Monitor
 pMonitor name = Monitor
