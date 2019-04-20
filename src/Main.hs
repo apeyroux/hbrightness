@@ -8,42 +8,11 @@ import           Data.Attoparsec.Text
 import           Data.Scientific (coefficient
                                  , toRealFloat)
 import qualified Data.Text as T
-import qualified Options.Applicative as OA
+import           HBrightness.Opt
+import           HBrightness.Types
 import           Shelly
 
 default (T.Text)
-
-data Action = Up | Down deriving (Show, Read, Eq)
-
-data Opt = Opt {
-  optScreenName :: String
-  , optAction :: Action
-  } deriving Show
-
-data Monitor = Monitor {
-  mName :: T.Text
-  , mConnected :: Bool
-  , mPrimary :: Bool
-  , mBrightness :: Double
-  } deriving Show
-
-newtype Brightness = Brightness Double deriving (Show, Read, Eq)
-
-instance Bounded Brightness where
-  minBound = Brightness 0.1
-  maxBound = Brightness 1.0
-
-pOpt :: OA.Parser Opt
-pOpt = Opt
-  <$> OA.strOption
-    (OA.long "monitor"
-     <> OA.short 'm'
-     <> OA.metavar "MONITORNAME")
-  <*> OA.option OA.auto
-    (OA.long "action"
-     <> OA.short 'a'
-     <> OA.value Up
-     <> OA.metavar "Up|Down")-- (pure Up OA.<|> pure Down)
 
 pMonitor :: T.Text -> Parser Monitor
 pMonitor name = Monitor
@@ -72,7 +41,7 @@ downBrightness m = shelly $ silently $ run_ "xrandr" ["--output"
 main :: IO ()
 main = do
   -- todo faire un check si xrandr est installé
-  args <- OA.execParser (OA.info pOpt OA.fullDesc)
+  args <- getOpts
   xr <- xrandr
   case args of
     Opt { optAction = Up } -> 
